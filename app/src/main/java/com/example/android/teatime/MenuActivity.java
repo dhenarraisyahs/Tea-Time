@@ -18,6 +18,7 @@ package com.example.android.teatime;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.VisibleForTesting;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -28,10 +29,24 @@ import com.example.android.teatime.model.Tea;
 
 import java.util.ArrayList;
 
-public class MenuActivity extends AppCompatActivity {
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+public class MenuActivity extends AppCompatActivity implements ImageDownloader.DelayerCallback {
 
     public final static String EXTRA_TEA_NAME = "com.example.android.teatime.EXTRA_TEA_NAME";
     Intent mTeaIntent;
+
+    @Nullable
+    private IdlingResource mIdlingResource;
+
+    @VisibleForTesting
+    @Nonnull
+    public IdlingResource getIdlingResource() {
+        if (mIdlingResource == null)
+            mIdlingResource = new IdlingResource();
+        return mIdlingResource;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,18 +55,33 @@ public class MenuActivity extends AppCompatActivity {
         Toolbar menuToolbar = (Toolbar) findViewById(R.id.menu_toolbar);
         setSupportActionBar(menuToolbar);
         getSupportActionBar().setTitle(getString(R.string.menu_title));
+        getIdlingResource();
 
         // Create an ArrayList of teas
-        final ArrayList<Tea> teas = new ArrayList<>();
-        teas.add(new Tea(getString(R.string.black_tea_name), R.drawable.black_tea));
-        teas.add(new Tea(getString(R.string.green_tea_name), R.drawable.green_tea));
-        teas.add(new Tea(getString(R.string.white_tea_name), R.drawable.white_tea));
-        teas.add(new Tea(getString(R.string.oolong_tea_name), R.drawable.oolong_tea));
-        teas.add(new Tea(getString(R.string.honey_lemon_tea_name), R.drawable.honey_lemon_tea));
-        teas.add(new Tea(getString(R.string.chamomile_tea_name), R.drawable.chamomile_tea));
+//        final ArrayList<Tea> teas = new ArrayList<>();
+//        teas.add(new Tea(getString(R.string.black_tea_name), R.drawable.black_tea));
+//        teas.add(new Tea(getString(R.string.green_tea_name), R.drawable.green_tea));
+//        teas.add(new Tea(getString(R.string.white_tea_name), R.drawable.white_tea));
+//        teas.add(new Tea(getString(R.string.oolong_tea_name), R.drawable.oolong_tea));
+//        teas.add(new Tea(getString(R.string.honey_lemon_tea_name), R.drawable.honey_lemon_tea));
+//        teas.add(new Tea(getString(R.string.chamomile_tea_name), R.drawable.chamomile_tea));
 
         // Create a {@link TeaAdapter}, whose data source is a list of {@link Tea}s.
         // The adapter know how to create grid items for each item in the list.
+
+
+
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        ImageDownloader.downloadImage(this, MenuActivity.this, mIdlingResource);
+    }
+
+    @Override
+    public void onDone(ArrayList<Tea> teas) {
         GridView gridview = (GridView) findViewById(R.id.tea_grid_view);
         TeaMenuAdapter adapter = new TeaMenuAdapter(this, R.layout.grid_item_layout, teas);
         gridview.setAdapter(adapter);
@@ -71,7 +101,5 @@ public class MenuActivity extends AppCompatActivity {
 
             }
         });
-
     }
-
 }

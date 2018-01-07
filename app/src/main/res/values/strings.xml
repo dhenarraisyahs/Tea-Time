@@ -93,4 +93,7 @@
         <item>75% - Moderately Sweet</item>
         <item>100% - Full Sweetness</item>
     </string-array>
+
+    <string name="done_message">Teah Anda sudah siap!</string>
+    <string name="loading_message">Loading Images</string>
 </resources>
